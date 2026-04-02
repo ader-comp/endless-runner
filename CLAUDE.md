@@ -105,15 +105,18 @@ SaveSystem   →  res://src/core/SaveSystem.gd
 ```
 
 ## 目前進度（每天更新這個區塊）
-- [ ] Step 1：專案結構建立
-- [ ] Step 2：無限地板生成
-- [ ] Step 3：角色移動 + 跳躍
-- [ ] Step 4：碰撞 + 死亡判定
-- [ ] Step 5：分數 + 存檔
-- [ ] Step 6：Web export 測試
-- [ ] Step 7：Android export 測試
-- [ ] Step 8：iOS export 測試
-- [ ] Step 9：Steam build 測試
+- [x] Step 1：專案骨架建立
+- [ ] Step 2：場景 + 地板捲動 + Web export（QA 開始參與）
+- [ ] Step 3：角色顯示 + 跳躍
+- [ ] Step 4：障礙物生成 + 移動
+- [ ] Step 5：碰撞 + 死亡判定
+- [ ] Step 6：分數系統
+- [ ] Step 7：最高分存檔
+- [ ] Step 8：主選單 + 重試流程
+- [ ] Step 9：速度遞增 + 難度曲線
+- [ ] Step 10：Android export
+- [ ] Step 11：Steam build (PC)
+- [ ] Step 12：iOS export（待設備到位）
 
 ## 已知問題 / 踩坑記錄
 （開發過程中隨時在這裡記錄，下次開對話 Claude Code 會讀到）
