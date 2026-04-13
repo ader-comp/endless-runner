@@ -1,10 +1,11 @@
 class_name HUD
 extends CanvasLayer
 
-## 分數顯示 Label（Step 2 時在場景中指定）
+## 分數顯示 Label
 @onready var score_label: Label = $ScoreLabel
 @onready var high_score_label: Label = $HighScoreLabel
 @onready var game_over_panel: Control = $GameOverPanel
+@onready var final_score_label: Label = $GameOverPanel/FinalScoreLabel
 @onready var retry_button: Button = $GameOverPanel/RetryButton
 
 
@@ -27,8 +28,9 @@ func _update_high_score() -> void:
 	high_score_label.text = "BEST: " + str(SaveSystem.load_high_score())
 
 
-## 遊戲結束時顯示結果面板
+## 遊戲結束時顯示結果面板與最終分數
 func _on_game_over(final_score: int) -> void:
+	final_score_label.text = "SCORE: " + str(final_score)
 	_update_high_score()
 	game_over_panel.visible = true
 

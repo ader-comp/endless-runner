@@ -1,0 +1,29 @@
+[gd_scene load_steps=8 format=3 uid="uid://main_scene"]
+
+[ext_resource type="Script" path="res://src/Main.gd" id="main_script"]
+[ext_resource type="Script" path="res://src/systems/WorldGenerator.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/entities/player.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://obstacle_scene" path="res://scenes/entities/obstacle.tscn" id="3"]
+[ext_resource type="Script" path="res://src/systems/ScoreSystem.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://hud_scene" path="res://scenes/ui/hud.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://main_menu_scene" path="res://scenes/ui/main_menu.tscn" id="6"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("main_script")
+
+[node name="WorldGenerator" type="Node" parent="."]
+script = ExtResource("1")
+obstacle_scene = ExtResource("3")
+
+[node name="ScoreSystem" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+position = Vector2(200, 500)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="HUD" parent="." instance=ExtResource("5")]
+
+[node name="MainMenu" parent="." instance=ExtResource("6")]

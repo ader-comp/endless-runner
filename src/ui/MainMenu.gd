@@ -8,6 +8,7 @@ extends CanvasLayer
 
 func _ready() -> void:
 	start_button.pressed.connect(_on_start_pressed)
+	EventBus.game_started.connect(_on_game_started)
 	_update_high_score()
 
 
@@ -19,3 +20,8 @@ func _update_high_score() -> void:
 ## 按下開始按鈕，發送 game_started 事件
 func _on_start_pressed() -> void:
 	EventBus.game_started.emit()
+
+
+## 遊戲開始時隱藏主選單（包含初次開始與 Retry）
+func _on_game_started() -> void:
+	visible = false
