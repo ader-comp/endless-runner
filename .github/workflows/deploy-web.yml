@@ -2,7 +2,7 @@ name: Deploy Web Build to GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [master, feature/billy/dev]
   workflow_dispatch:
 
 # 讓 GITHUB_TOKEN 有權限部署到 Pages
