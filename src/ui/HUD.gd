@@ -7,13 +7,16 @@ extends CanvasLayer
 @onready var game_over_panel: Control = $GameOverPanel
 @onready var final_score_label: Label = $GameOverPanel/FinalScoreLabel
 @onready var retry_button: Button = $GameOverPanel/RetryButton
+@onready var menu_button: Button = $GameOverPanel/MenuButton
 
 
 func _ready() -> void:
 	EventBus.score_changed.connect(_on_score_changed)
 	EventBus.game_over.connect(_on_game_over)
 	EventBus.game_started.connect(_on_game_started)
+	EventBus.returned_to_menu.connect(_on_returned_to_menu)
 	retry_button.pressed.connect(_on_retry_pressed)
+	menu_button.pressed.connect(_on_menu_pressed)
 	_update_high_score()
 	game_over_panel.visible = false
 
@@ -44,3 +47,15 @@ func _on_game_started() -> void:
 ## 重試按鈕：重新開始遊戲
 func _on_retry_pressed() -> void:
 	EventBus.game_started.emit()
+
+
+## 返回主選單按鈕
+func _on_menu_pressed() -> void:
+	EventBus.returned_to_menu.emit()
+
+
+## 回到主選單時隱藏結果面板並歸零分數
+func _on_returned_to_menu() -> void:
+	game_over_panel.visible = false
+	score_label.text = "0"
+	_update_high_score()

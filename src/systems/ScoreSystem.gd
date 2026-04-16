@@ -39,6 +39,7 @@ func _on_game_started() -> void:
 
 
 ## 遊戲結束時儲存最高分
+## 先存檔再 emit，確保訂閱者（HUD）讀到的是最新的最高分
 func _on_player_died() -> void:
-	EventBus.game_over.emit(_score)
 	SaveSystem.save_high_score(_score)
+	EventBus.game_over.emit(_score)

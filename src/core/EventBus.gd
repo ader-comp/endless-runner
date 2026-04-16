@@ -18,3 +18,6 @@ signal player_jumped()
 
 ## 障礙物生成
 signal obstacle_spawned(obstacle: Node)
+
+## 從 Game Over 返回主選單
+signal returned_to_menu()

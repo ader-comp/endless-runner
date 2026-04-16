@@ -16,6 +16,7 @@ var _speed_timer: float = 0.0
 func _ready() -> void:
 	EventBus.game_started.connect(_on_game_started)
 	EventBus.player_died.connect(_on_player_died)
+	EventBus.returned_to_menu.connect(_on_returned_to_menu)
 
 
 func _process(delta: float) -> void:
@@ -56,3 +57,7 @@ func _on_game_started() -> void:
 
 func _on_player_died() -> void:
 	change_state(GameState.DEAD)
+
+
+func _on_returned_to_menu() -> void:
+	change_state(GameState.MENU)

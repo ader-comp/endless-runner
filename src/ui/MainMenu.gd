@@ -9,6 +9,7 @@ extends CanvasLayer
 func _ready() -> void:
 	start_button.pressed.connect(_on_start_pressed)
 	EventBus.game_started.connect(_on_game_started)
+	EventBus.returned_to_menu.connect(_on_returned_to_menu)
 	_update_high_score()
 
 
@@ -25,3 +26,9 @@ func _on_start_pressed() -> void:
 ## 遊戲開始時隱藏主選單（包含初次開始與 Retry）
 func _on_game_started() -> void:
 	visible = false
+
+
+## 從 Game Over 返回主選單時重新顯示並刷新最高分
+func _on_returned_to_menu() -> void:
+	_update_high_score()
+	visible = true
