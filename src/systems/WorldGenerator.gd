@@ -7,9 +7,6 @@ extends Node
 ## 生成位置 X（畫面右側外）
 var _spawn_x: float = 0.0
 
-## 視窗寬度
-var _viewport_width: float = 0.0
-
 ## 生成計時器
 var _spawn_timer: Timer
 
@@ -18,10 +15,9 @@ var _ground_tiles: Array[StaticBody2D] = []
 
 
 func _ready() -> void:
-	_viewport_width = ProjectSettings.get_setting("display/window/size/viewport_width")
-	_spawn_x = _viewport_width + 100.0
 	_setup_timer()
 	_setup_ground()
+	get_viewport().size_changed.connect(_on_viewport_resized)
 	EventBus.game_started.connect(_on_game_started)
 	EventBus.player_died.connect(_on_player_died)
 
@@ -35,17 +31,36 @@ func _process(delta: float) -> void:
 # === 地板系統 ===
 
 
-## 建立地板物件池：用足夠的磚塊覆蓋畫面 + 一塊緩衝
+## 依目前可視範圍建立地板，並同步生成 X
 func _setup_ground() -> void:
-	var tile_count := ceili(_viewport_width / Constants.GROUND_TILE_WIDTH) + 2
-	for i in tile_count:
-		var tile := _create_ground_tile()
-		tile.position = Vector2(
-			i * Constants.GROUND_TILE_WIDTH,
-			Constants.GROUND_Y
-		)
-		add_child(tile)
-		_ground_tiles.append(tile)
+	_refresh_spawn_x()
+	_ensure_ground_coverage()
+
+
+## 確保地板涵蓋 [可視左緣 - 一塊, 可視右緣 + 一塊]，缺則補
+func _ensure_ground_coverage() -> void:
+	var bounds := _get_visible_bounds_x()
+	var needed_left := bounds.x - Constants.GROUND_TILE_WIDTH
+	var needed_right := bounds.y + Constants.GROUND_TILE_WIDTH
+	if _ground_tiles.is_empty():
+		var start_x: float = floor(needed_left / Constants.GROUND_TILE_WIDTH) * Constants.GROUND_TILE_WIDTH
+		var x := start_x
+		while x <= needed_right:
+			_add_ground_tile(x)
+			x += Constants.GROUND_TILE_WIDTH
+		return
+	while _find_rightmost_x() < needed_right:
+		_add_ground_tile(_find_rightmost_x() + Constants.GROUND_TILE_WIDTH)
+	while _find_leftmost_x() > needed_left:
+		_add_ground_tile(_find_leftmost_x() - Constants.GROUND_TILE_WIDTH)
+
+
+## 在指定 X 新增一塊地板磚塊到池中
+func _add_ground_tile(x: float) -> void:
+	var tile := _create_ground_tile()
+	tile.position = Vector2(x, Constants.GROUND_Y)
+	add_child(tile)
+	_ground_tiles.append(tile)
 
 
 ## 建立單個地板磚塊（StaticBody2D + CollisionShape2D + ColorRect）
@@ -67,13 +82,14 @@ func _create_ground_tile() -> StaticBody2D:
 	return body
 
 
-## 捲動地板，超出畫面左側的磚塊回收到右側
+## 捲動地板，超出可視左側緩衝的磚塊回收到最右側
 func _scroll_ground(delta: float) -> void:
 	var speed := GameManager.current_speed
+	var recycle_threshold := _get_visible_bounds_x().x - Constants.GROUND_TILE_WIDTH
 	var rightmost_x := _find_rightmost_x()
 	for tile in _ground_tiles:
 		tile.position.x -= speed * delta
-		if tile.position.x <= -Constants.GROUND_TILE_WIDTH:
+		if tile.position.x <= recycle_threshold:
 			tile.position.x = rightmost_x + Constants.GROUND_TILE_WIDTH
 			rightmost_x = tile.position.x
 
@@ -85,6 +101,35 @@ func _find_rightmost_x() -> float:
 		if tile.position.x > max_x:
 			max_x = tile.position.x
 	return max_x
+
+
+## 找出最左側磚塊的 X 座標
+func _find_leftmost_x() -> float:
+	var min_x := INF
+	for tile in _ground_tiles:
+		if tile.position.x < min_x:
+			min_x = tile.position.x
+	return min_x
+
+
+## 回傳相機可視的 X 範圍（x=左緣, y=右緣）
+func _get_visible_bounds_x() -> Vector2:
+	var visible_size := get_viewport().get_visible_rect().size
+	var camera := get_viewport().get_camera_2d()
+	var camera_x: float = camera.position.x if camera else visible_size.x / 2.0
+	var half: float = visible_size.x / 2.0
+	return Vector2(camera_x - half, camera_x + half)
+
+
+## 更新障礙物生成 X 為目前可視右緣 + 緩衝
+func _refresh_spawn_x() -> void:
+	_spawn_x = _get_visible_bounds_x().y + 100.0
+
+
+## 視窗尺寸變動時，補足邊界磚塊與生成位置
+func _on_viewport_resized() -> void:
+	_refresh_spawn_x()
+	_ensure_ground_coverage()
 
 
 # === 障礙物系統 ===
